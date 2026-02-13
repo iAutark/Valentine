@@ -1,0 +1,1158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Valentine</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Satisfy&family=Playfair+Display:wght@400;600&family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Inter", sans-serif;
+        background: #110011;
+        color: white;
+        overflow: hidden;
+      }
+
+      /* Soft animated glow background */
+      body::before {
+        content: "";
+        position: fixed;
+        width: 200%;
+        height: 200%;
+        background:
+          radial-gradient(circle at 20% 30%, #ff4d8d33, transparent 40%),
+          radial-gradient(circle at 80% 70%, #9b004f33, transparent 40%);
+        animation: moveBg 18s ease-in-out infinite alternate;
+        z-index: -1;
+      }
+      @keyframes moveBg {
+        from {
+          transform: translate(-8%, -8%);
+        }
+        to {
+          transform: translate(8%, 8%);
+        }
+      }
+
+      /* Sections */
+      .section {
+        position: absolute;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        opacity: 0;
+        transform: translateY(25px);
+        transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        pointer-events: none;
+      }
+      .section.active {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+
+      /* Card */
+      .card {
+        max-width: 1000px;
+        width: 100%;
+        max-height: 85vh;
+        overflow: auto;
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 2.5rem;
+        text-align: center;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7);
+      }
+      .card::-webkit-scrollbar {
+        width: 6px;
+      }
+      .card::-webkit-scrollbar-thumb {
+        background: #ff4d8d;
+        border-radius: 10px;
+      }
+
+      h1 {
+        font-family: "Satisfy", cursive;
+      }
+      .sub {
+        font-family: "Playfair Display", serif;
+      }
+
+      /* Button */
+      .btn {
+        margin-top: 2rem;
+        padding: 0.9rem 2.5rem;
+        background: #ff4d8d;
+        border-radius: 999px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        display: inline-block;
+      }
+      .btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 10px 30px rgba(255, 77, 141, 0.6);
+      }
+
+      /* Voucher Grid */
+      .voucher-grid {
+        margin-top: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 1.4rem;
+      }
+
+      /* Voucher Flip */
+      .voucher {
+        perspective: 1000px;
+        cursor: pointer;
+        position: relative;
+      }
+      .voucher-inner {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        transform-style: preserve-3d;
+        transition: transform 0.9s;
+      }
+      .voucher.open .voucher-inner {
+        transform: rotateY(180deg);
+      }
+
+      .voucher-front,
+      .voucher-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 18px;
+        backface-visibility: hidden;
+        padding: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .voucher-front {
+        background: linear-gradient(135deg, #ff4d8d, #ff7eb3, #9b004f);
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+
+      .voucher-back {
+        background: linear-gradient(135deg, #c2006f, #ff4d8d, #ff7eb3);
+        transform: rotateY(180deg);
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      /* ================= RARE TIER ================= */
+      .rare .voucher-front {
+        background: linear-gradient(135deg, #7b2ff7, #f107a3);
+        animation: rareGlow 2s infinite alternate;
+      }
+      .rare .voucher-back {
+        background: linear-gradient(135deg, #9d4edd, #ff4d8d);
+      }
+
+      @keyframes rareGlow {
+        from {
+          box-shadow: 0 0 12px #a855f7;
+        }
+        to {
+          box-shadow: 0 0 30px #ec4899;
+        }
+      }
+
+      /* ================= LEGENDARY TIER ================= */
+      .legendary .voucher-front {
+        background: linear-gradient(135deg, #ffd700, #ffb300, #ff8c00);
+        color: #3a2200;
+        font-weight: 700;
+        animation: goldGlow 2s infinite alternate;
+      }
+      .legendary .voucher-back {
+        background: linear-gradient(135deg, #ffb300, #ffd700, #ffc107);
+        color: #3a2200;
+      }
+
+      @keyframes goldGlow {
+        from {
+          box-shadow: 0 0 15px #ffd700;
+        }
+        to {
+          box-shadow: 0 0 40px #ffb300;
+        }
+      }
+
+      /* ================= Alert ========================= */
+      /* Unlock Banner */
+      .unlock-banner {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #ff4d8d, #ff7eb3);
+        padding: 14px 30px;
+        border-radius: 999px;
+        font-weight: 600;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        opacity: 0;
+        transition: 0.5s;
+        z-index: 9999;
+      }
+
+      .unlock-banner.show {
+        opacity: 1;
+        top: 40px;
+      }
+
+      /* ================= MARRIAGE TIER ================= */
+      .marriage .voucher-front {
+        background: linear-gradient(135deg, #ffffff, #ffd700);
+        color: #3a2200;
+        font-weight: 700;
+        animation: marriageGlow 3s infinite alternate;
+      }
+      .marriage .voucher-back {
+        background: linear-gradient(135deg, #fff, #ffd700, #ffb300);
+        color: #3a2200;
+      }
+
+      @keyframes marriageGlow {
+        from {
+          box-shadow: 0 0 15px #fff;
+        }
+        to {
+          box-shadow: 0 0 45px #ffd700;
+        }
+      }
+
+      /* Heart burst */
+      .burst {
+        position: absolute;
+        font-size: 18px;
+        animation: burstAnim 1s ease forwards;
+      }
+      @keyframes burstAnim {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-40px);
+        }
+      }
+
+      /* Envelope */
+      .envelope {
+        font-size: 60px;
+        cursor: pointer;
+        transition: 0.4s;
+      }
+      .envelope:hover {
+        transform: scale(1.1);
+      }
+
+      /* Letter */
+      .letter {
+        margin-top: 2rem;
+        text-align: left;
+        line-height: 2;
+        font-family: "Playfair Display", serif;
+        white-space: pre-line;
+        min-height: 320px;
+      }
+
+      /* Final pulse */
+      .pulse {
+        animation: pulseGlow 2s infinite alternate;
+      }
+      @keyframes pulseGlow {
+        from {
+          text-shadow: 0 0 10px #ff4d8d;
+        }
+        to {
+          text-shadow: 0 0 25px #ff4d8d;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <audio id="bgMusic" loop>
+      <source src="love.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- INTRO -->
+    <section class="section active" id="intro">
+      <div class="card">
+        <h1 class="text-5xl">Happy Valentine Day My Cutie 💖</h1>
+        <p class="sub text-xl mt-6">I made something special for you.</p>
+        <div class="btn" onclick="startExperience()">Continue 💞</div>
+      </div>
+    </section>
+
+    <!-- STORY -->
+    <section class="section" id="story">
+      <div class="card">
+        <h1 class="text-4xl">Our Story 💗</h1>
+        <p class="sub text-lg mt-6">
+          November 2021 — We met.<br /><br />
+          16th May 2025 — I asked you to be mine.<br /><br />
+          And I still choose you. Every single day.
+        </p>
+        <div class="btn" onclick="next('vouchers')">
+          Open Your Love Vouchers 💌
+        </div>
+      </div>
+    </section>
+
+    <!-- VOUCHERS -->
+    <section class="section" id="vouchers">
+      <div class="card">
+        <h1 class="text-4xl">Love Contract 💝</h1>
+        <div class="voucher-grid" id="voucherContainer"></div>
+        <div class="btn" onclick="next('envelope')">Open My Letter 💗</div>
+      </div>
+    </section>
+
+    <!-- ENVELOPE -->
+    <section class="section" id="envelope">
+      <div class="card">
+        <div class="envelope" onclick="next('letter')">💌</div>
+        <p class="sub mt-4">Click the envelope to read.</p>
+      </div>
+    </section>
+
+    <!-- LETTER -->
+    <section class="section" id="letter">
+      <div class="card">
+        <h1 class="text-4xl">For You 💞</h1>
+        <div id="letterText" class="letter"></div>
+        <div class="btn" onclick="next('final')">Final 💖</div>
+      </div>
+    </section>
+
+    <!-- FINAL -->
+    <section class="section" id="final">
+      <div class="card">
+        <h1 class="text-5xl pulse">Forever Yours 💗</h1>
+        <p class="sub text-xl mt-6">
+          Today through screens.<br /><br />
+          Tomorrow in each other's arms.
+        </p>
+      </div>
+    </section>
+
+    <script>
+      const music = document.getElementById("bgMusic");
+
+      /* ================= MUSIC ================= */
+
+      function startExperience() {
+        music.currentTime = 0;
+        music.volume = 0;
+        music.play();
+
+        let fade = setInterval(() => {
+          if (music.volume < 0.9) music.volume += 0.05;
+          else clearInterval(fade);
+        }, 200);
+
+        next("story");
+      }
+
+      function next(id) {
+        document
+          .querySelectorAll(".section")
+          .forEach((s) => s.classList.remove("active"));
+
+        setTimeout(() => {
+          document.getElementById(id).classList.add("active");
+        }, 300);
+      }
+
+      /* ================= VOUCHER SYSTEM ================= */
+
+      let openedCount = 0;
+      let rareUnlocked = false;
+      let legendaryUnlocked = false;
+      let marriageUnlocked = false;
+
+      const container = document.getElementById("voucherContainer");
+
+      /* ===== Your normal vouchers come from external file ===== */
+      const vouchers = [
+        /* 💖 Daily Romance Tier */
+        {
+          title: "Good Morning Kiss 💋",
+          limit: "Daily",
+          note: "First smile of your day belongs to me.",
+        },
+        {
+          title: "Good Night Hug 🌙",
+          limit: "Daily",
+          note: "Sleep peacefully knowing you're loved.",
+        },
+        {
+          title: "Random 'I Miss You' Text 📱",
+          limit: "Unlimited",
+          note: "Warning: sudden butterflies possible.",
+        },
+        {
+          title: "Compliment Boost 💖",
+          limit: "Daily",
+          note: "Confidence recharge activated.",
+        },
+        {
+          title: "Voice Note Surprise 🎧",
+          limit: "Weekly",
+          note: "Soft voice, softer heart.",
+        },
+
+        /* 🤍 Comfort & Care Tier */
+        {
+          title: "Unlimited Hugs 🤍",
+          limit: "Unlimited",
+          note: "Tight enough to fix everything.",
+        },
+        {
+          title: "Cuddle Session 🧸",
+          limit: "Unlimited",
+          note: "No time restriction.",
+        },
+        {
+          title: "Comfort Support 💓",
+          limit: "Unlimited",
+          note: "Even on your worst days.",
+        },
+        {
+          title: "Protection Promise 🛡️",
+          limit: "Lifetime",
+          note: "You are safe with me.",
+        },
+        {
+          title: "Patience Mode 💟",
+          limit: "Unlimited",
+          note: "Even during mood swings.",
+        },
+
+        /* 💞 Date & Fun Tier */
+        {
+          title: "Movie Night 🎬",
+          limit: "2 per week",
+          note: "Snacks included.",
+        },
+        {
+          title: "Late Night Talks 🌙",
+          limit: "Unlimited",
+          note: "Deep talks till sunrise.",
+        },
+        { title: "Long Walk 🚶‍♂️", limit: "Monthly", note: "Hand in hand." },
+        {
+          title: "Laugh Attack 😂",
+          limit: "Unlimited",
+          note: "Inside jokes forever.",
+        },
+        {
+          title: "Dance Together 💃",
+          limit: "Monthly",
+          note: "Even if we’re bad at it.",
+        },
+
+        /* 🔒 Loyalty & Forever Tier */
+        {
+          title: "Forever Loyalty 🔒",
+          limit: "Lifetime",
+          note: "Only you. Always.",
+        },
+        {
+          title: "Jealousy Control 😌",
+          limit: "Lifetime",
+          note: "Trust is our strength.",
+        },
+        {
+          title: "Future Plan Date 🏡",
+          limit: "Yearly",
+          note: "Dream big together.",
+        },
+        {
+          title: "Anniversary Effort 💝",
+          limit: "Yearly",
+          note: "Extra special every time.",
+        },
+        {
+          title: "Lifetime Love 💕",
+          limit: "Infinite",
+          note: "No expiry. No returns.",
+        },
+
+        /* 😌 Slightly Playful Tier (ahem hehe) */
+        {
+          title: "Steal A Kiss 💋",
+          limit: "Unlimited",
+          note: "Caught or not caught.",
+        },
+        {
+          title: "Whisper In Ear 🤫",
+          limit: "Unlimited",
+          note: "Close enough to feel your breath.",
+        },
+        {
+          title: "Jealous Tease 😏",
+          limit: "Occasionally",
+          note: "Only to see you cling.",
+        },
+        {
+          title: "Slow Dance In Kitchen 🕯️",
+          limit: "Monthly",
+          note: "Soft lights. Just us.",
+        },
+        {
+          title: "Hold You From Behind 🤍",
+          limit: "Unlimited",
+          note: "Unexpected but safe.",
+        },
+
+        /* 🔥 Extra Special Tier */
+        {
+          title: "Surprise Date Plan 🎁",
+          limit: "Quarterly",
+          note: "You won’t see it coming.",
+        },
+        {
+          title: "Love Letter 💌",
+          limit: "Monthly",
+          note: "Handwritten next time.",
+        },
+        {
+          title: "Care Package 📦",
+          limit: "Quarterly",
+          note: "Filled with thoughts of you.",
+        },
+        {
+          title: "Photo Memory Frame 🖼️",
+          limit: "Yearly",
+          note: "Our favorite moment.",
+        },
+        {
+          title: "Secret Nickname 🤭",
+          limit: "Exclusive",
+          note: "Only I can call you that.",
+        },
+
+        /* 🌙 Intimate Energy Tier (romantic, not explicit) */
+        {
+          title: "Long Eye Contact 👀",
+          limit: "Unlimited",
+          note: "Say everything without words.",
+        },
+        {
+          title: "Forehead Kiss 🤍",
+          limit: "Unlimited",
+          note: "Pure and protective.",
+        },
+        {
+          title: "Slow Hand Hold 🤝",
+          limit: "Unlimited",
+          note: "Gentle but firm.",
+        },
+        {
+          title: "Stay A Little Longer 🕰️",
+          limit: "Unlimited",
+          note: "Just five more minutes.",
+        },
+        {
+          title: "Shared Blanket Night 🧣",
+          limit: "Winter Only",
+          note: "Closer than usual.",
+        },
+
+        /* 💎 Premium Commitment Tier */
+        {
+          title: "Support Your Dreams 🌟",
+          limit: "Lifetime",
+          note: "Your success is mine too.",
+        },
+        {
+          title: "Motivation Boost 🚀",
+          limit: "Unlimited",
+          note: "You can do it. Always.",
+        },
+        {
+          title: "Celebrate Every Win 🏆",
+          limit: "Unlimited",
+          note: "Big or small.",
+        },
+        {
+          title: "Forgiveness Token 🤍",
+          limit: "Unlimited",
+          note: "We grow, not break.",
+        },
+        {
+          title: "Choose You Again 💗",
+          limit: "Daily",
+          note: "Every single day.",
+        },
+        /* 🌸 Soft Romance Expansion */
+        {
+          title: "Cheek Kiss 🌸",
+          limit: "Unlimited",
+          note: "Soft, slow, meaningful.",
+        },
+        {
+          title: "Back Hug 🤍",
+          limit: "Unlimited",
+          note: "Unexpected but comforting.",
+        },
+        {
+          title: "Play With Your Hair 💇‍♀️",
+          limit: "Unlimited",
+          note: "Gentle fingers only.",
+        },
+        {
+          title: "Slow Forehead Touch 🤍",
+          limit: "Unlimited",
+          note: "Breathing the same air.",
+        },
+        {
+          title: "Smile Stealer 😊",
+          limit: "Unlimited",
+          note: "My mission is your smile.",
+        },
+
+        /* 💕 Emotional Depth Tier */
+        {
+          title: "Listen Without Interrupting 🎧",
+          limit: "Unlimited",
+          note: "Your words matter.",
+        },
+        {
+          title: "Understand Without Judging 🤍",
+          limit: "Unlimited",
+          note: "Safe space always.",
+        },
+        {
+          title: "Fix Bad Day Mode 💓",
+          limit: "Unlimited",
+          note: "Emergency comfort activated.",
+        },
+        {
+          title: "Stay Through Storm 🌧️",
+          limit: "Lifetime",
+          note: "Not leaving during hard times.",
+        },
+        {
+          title: "Celebrate Your Growth 🌱",
+          limit: "Unlimited",
+          note: "Proud of who you’re becoming.",
+        },
+
+        /* 🔥 Ahem Hehe Expansion */
+        {
+          title: "Pull You Closer 😏",
+          limit: "Unlimited",
+          note: "When distance feels illegal.",
+        },
+        {
+          title: "Slow Spin Hug 💞",
+          limit: "Monthly",
+          note: "Lift + laugh combo.",
+        },
+        {
+          title: "Secret Smile Across Room 😉",
+          limit: "Unlimited",
+          note: "Only we understand it.",
+        },
+        {
+          title: "Steal You Away Moment 💋",
+          limit: "Occasionally",
+          note: "Just us, no distractions.",
+        },
+        {
+          title: "Midnight Whisper 🌙",
+          limit: "Unlimited",
+          note: "Low voice, close distance.",
+        },
+
+        /* 🎬 Cinematic Love Tier */
+        {
+          title: "Rain Walk Scene 🌧️",
+          limit: "Yearly",
+          note: "Movie-style romance.",
+        },
+        {
+          title: "Airport Hug Scene ✈️",
+          limit: "Whenever Needed",
+          note: "Long and tight.",
+        },
+        {
+          title: "Slow Motion Look 💘",
+          limit: "Unlimited",
+          note: "Time freezes for us.",
+        },
+        {
+          title: "Sunset Hand Hold 🌇",
+          limit: "Monthly",
+          note: "Golden hour glow.",
+        },
+        {
+          title: "Kitchen Dance Scene 💃",
+          limit: "Monthly",
+          note: "Music optional.",
+        },
+
+        /* 🌙 Cozy Night Tier */
+        {
+          title: "Blanket Burrito 🧣",
+          limit: "Winter Only",
+          note: "Wrapped together.",
+        },
+        {
+          title: "Fall Asleep On Call 📱",
+          limit: "Unlimited",
+          note: "Breathing sync mode.",
+        },
+        {
+          title: "Shoulder Rest 🤍",
+          limit: "Unlimited",
+          note: "Lean whenever tired.",
+        },
+        {
+          title: "Warm Tea Together ☕",
+          limit: "Weekly",
+          note: "Calm conversations.",
+        },
+        {
+          title: "Lazy Sunday 🛌",
+          limit: "Monthly",
+          note: "No alarms allowed.",
+        },
+
+        /* 💍 Commitment Tier Expansion */
+        {
+          title: "Meet The Parents Plan 👨‍👩‍👧",
+          limit: "Future",
+          note: "Serious intentions.",
+        },
+        {
+          title: "Travel Together ✈️",
+          limit: "Yearly",
+          note: "New memories unlocked.",
+        },
+        {
+          title: "Build Dreams Together 🏗️",
+          limit: "Lifetime",
+          note: "Step by step.",
+        },
+        {
+          title: "Financial Support Promise 💰",
+          limit: "Lifetime",
+          note: "Team mentality.",
+        },
+        {
+          title: "Grow Old Together 👵👴",
+          limit: "Lifetime",
+          note: "Wrinkles and all.",
+        },
+
+        /* 😌 Gentle Intimate Energy */
+        {
+          title: "Hold Waist Softly 🤍",
+          limit: "Unlimited",
+          note: "Protective but gentle.",
+        },
+        {
+          title: "Brush Nose Touch 🥰",
+          limit: "Unlimited",
+          note: "Eskimo vibes.",
+        },
+        {
+          title: "Look At You Like That 👀",
+          limit: "Unlimited",
+          note: "You know the look.",
+        },
+        {
+          title: "Stay Quiet Together 🤫",
+          limit: "Unlimited",
+          note: "Silence but connected.",
+        },
+        {
+          title: "Heartbeat Sync 💓",
+          limit: "Unlimited",
+          note: "Chest to chest calm.",
+        },
+
+        /* 🌟 Motivation & Support Tier */
+        {
+          title: "Exam Motivation Boost 📚",
+          limit: "Unlimited",
+          note: "You will win.",
+        },
+        {
+          title: "Career Push Mode 🚀",
+          limit: "Unlimited",
+          note: "No self-doubt allowed.",
+        },
+        {
+          title: "Gym Accountability 🏋️",
+          limit: "Weekly",
+          note: "Stay strong together.",
+        },
+        {
+          title: "Cheer From Sidelines 📣",
+          limit: "Unlimited",
+          note: "Loudest supporter.",
+        },
+        {
+          title: "Remind You Of Worth 🌟",
+          limit: "Daily",
+          note: "Never forget it.",
+        },
+
+        /* 💘 Cute Chaos Tier */
+        {
+          title: "Playful Argument 😜",
+          limit: "Occasionally",
+          note: "Ends with hugs.",
+        },
+        {
+          title: "Random Selfie Together 🤳",
+          limit: "Weekly",
+          note: "Memory capture.",
+        },
+        {
+          title: "Nickname Upgrade 🫶",
+          limit: "Exclusive",
+          note: "New cute name unlocked.",
+        },
+        {
+          title: "Mock Jealous Face 😏",
+          limit: "Occasionally",
+          note: "Acting skills required.",
+        },
+        { title: "Tickle Attack 😂", limit: "Monthly", note: "No mercy." },
+
+        /* 🔐 Exclusive VIP Tier */
+        {
+          title: "Golden Date Night ✨",
+          limit: "Yearly",
+          note: "Maximum effort mode.",
+        },
+        {
+          title: "Anniversary Grand Gesture 🎉",
+          limit: "Yearly",
+          note: "Bigger every year.",
+        },
+        {
+          title: "Midnight Surprise Visit 🌙",
+          limit: "Special Occasions",
+          note: "Shock value 100%.",
+        },
+        {
+          title: "Promise Renewal 💍",
+          limit: "Every Year",
+          note: "Choose you again.",
+        },
+        {
+          title: "Priority Above All 💖",
+          limit: "Lifetime",
+          note: "You first.",
+        },
+
+        /* 🫶 Emotional Security Tier */
+        {
+          title: "Talk It Out Always 🤝",
+          limit: "Unlimited",
+          note: "No silent wars.",
+        },
+        {
+          title: "Respect Your Space 🌿",
+          limit: "Unlimited",
+          note: "Healthy love.",
+        },
+        {
+          title: "Apology Without Ego 🤍",
+          limit: "Unlimited",
+          note: "Growth mindset.",
+        },
+        {
+          title: "Protect Your Peace 🕊️",
+          limit: "Lifetime",
+          note: "No chaos allowed.",
+        },
+        {
+          title: "Safe Place Promise 🏡",
+          limit: "Lifetime",
+          note: "Emotionally secure.",
+        },
+
+        /* 💗 Infinite Loop Tier */
+        {
+          title: "Choose You Again 💞",
+          limit: "Daily",
+          note: "Not forced. Wanted.",
+        },
+        {
+          title: "Fall For You Again 💘",
+          limit: "Unlimited",
+          note: "Butterflies never expire.",
+        },
+        {
+          title: "Look At You Like First Time 👀",
+          limit: "Unlimited",
+          note: "Still amazed.",
+        },
+        {
+          title: "Grateful For You 💓",
+          limit: "Daily",
+          note: "Never taken for granted.",
+        },
+        { title: "Forever Us ♾️", limit: "Infinite", note: "No end credits." },
+      ];
+
+      /* ===== Normal Voucher Render ===== */
+
+      vouchers.forEach((v) => {
+        const div = document.createElement("div");
+        div.className = "voucher";
+
+        div.innerHTML = `
+    <div class="voucher-inner">
+      <div class="voucher-front">${v.title}</div>
+      <div class="voucher-back">
+        Starts From: 16 May 2025<br>
+        Limit: ${v.limit}<br>
+        Valid Till: Forever<br><br>
+        <b>Special Message:</b><br>${v.note}
+      </div>
+    </div>`;
+
+        div.onclick = function () {
+          if (!this.classList.contains("open")) {
+            openedCount++;
+          }
+
+          this.classList.toggle("open");
+
+          heartBurst(this);
+
+          /* ===== Unlock Progression ===== */
+
+          if (openedCount >= 10 && !rareUnlocked) {
+            unlockRare();
+            rareUnlocked = true;
+          }
+
+          if (openedCount >= 20 && !legendaryUnlocked) {
+            unlockLegendary();
+            legendaryUnlocked = true;
+          }
+
+          if (openedCount >= 23 && legendaryUnlocked && !marriageUnlocked) {
+            unlockMarriage();
+            marriageUnlocked = true;
+          }
+        };
+
+        container.appendChild(div);
+      });
+
+      /* ================= HEART EFFECT ================= */
+
+      function heartBurst(element) {
+        const heart = document.createElement("div");
+        heart.className = "burst";
+        const hearts = ["💖", "💞", "💕", "💘", "❤️"];
+        heart.innerText = hearts[Math.floor(Math.random() * hearts.length)];
+        heart.style.left = "50%";
+        heart.style.top = "10px";
+        element.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+      }
+
+      /* ================= DATA ================= */
+
+      const rareVouchers = [
+        {
+          title: "💜 Priority Hug",
+          limit: "Daily",
+          note: "Overrides any mood instantly.",
+        },
+        {
+          title: "🌙 Midnight Comfort",
+          limit: "Daily",
+          note: "I stay until you feel safe.",
+        },
+        {
+          title: "✨ Princess Treatment",
+          limit: "Daily",
+          note: "You get royal energy.",
+        },
+        {
+          title: "💞 Full Attention Mode",
+          limit: "Weekly",
+          note: "No distractions. Just you.",
+        },
+        {
+          title: "🫀 Emotional Rescue",
+          limit: "Unlimited",
+          note: "Sadness not allowed.",
+        },
+      ];
+
+      const legendaryVouchers = [
+        {
+          title: "👑 Lifetime Devotion",
+          limit: "1",
+          note: "I choose you. Always.",
+        },
+        {
+          title: "💍 Future Ring Promise",
+          limit: "1",
+          note: "Not words. Intentions.",
+        },
+        {
+          title: "🔥 Once In A Lifetime Kiss",
+          limit: "1",
+          note: "The kind that changes everything.",
+        },
+      ];
+
+      const marriageVouchers = [
+        { title: "💍 Forever Mine", limit: "1", note: "Permanent. No expiry." },
+        {
+          title: "🏡 Lifetime Together",
+          limit: "1",
+          note: "Same future. Same home.",
+        },
+        {
+          title: "👑 Wife Priority Access",
+          limit: "Unlimited",
+          note: "Top authority over my heart.",
+        },
+      ];
+
+      /* ================= UNLOCK FUNCTIONS ================= */
+
+      function unlockRare() {
+        showBanner("💜 Rare Tier Unlocked");
+        rareVouchers.forEach((v) => {
+          createSpecialVoucher(v, "rare");
+        });
+      }
+
+      function unlockLegendary() {
+        showBanner("👑 Legendary Tier Unlocked");
+        legendaryVouchers.forEach((v) => {
+          createSpecialVoucher(v, "legendary");
+        });
+      }
+
+      function unlockMarriage() {
+        showBanner("💍 Marriage Tier Unlocked");
+        marriageVouchers.forEach((v) => {
+          createSpecialVoucher(v, "marriage");
+        });
+      }
+
+      /* ================= CREATOR ================= */
+
+      function createSpecialVoucher(v, type) {
+        const div = document.createElement("div");
+        div.className = "voucher " + type;
+
+        div.innerHTML = `
+    <div class="voucher-inner">
+      <div class="voucher-front">${v.title}</div>
+      <div class="voucher-back">
+        Starts From: 16 May 2025<br>
+        Limit: ${v.limit}<br>
+        Valid Till: Lifetime<br><br>
+        <b>Special Message:</b><br>${v.note}
+      </div>
+    </div>`;
+
+        div.onclick = function () {
+          this.classList.toggle("open");
+          heartBurst(this);
+        };
+
+        container.appendChild(div);
+      }
+
+      /* ================= LETTER ================= */
+
+      const letterContent = `My Love,
+
+From November 2021 to today,
+our story has grown beautifully.
+
+On 16th May 2025,
+I chose you.
+
+And I still choose you.
+Every single day.
+
+Distance never weakened us.
+It strengthened us.
+
+Because what we have is real.
+
+One day,
+screens will turn into presence,
+and I will finally hold your hand
+the way it always deserved.
+
+Secure.
+Calm.
+Certain.
+
+Like home.
+
+Always yours.`;
+
+      let i = 0;
+
+      function typeLetter() {
+        if (i < letterContent.length) {
+          document.getElementById("letterText").textContent +=
+            letterContent.charAt(i);
+          i++;
+          setTimeout(typeLetter, 40);
+        }
+      }
+
+      document.getElementById("letter").addEventListener(
+        "mouseenter",
+        () => {
+          if (i === 0) typeLetter();
+        },
+        { once: true },
+      );
+
+      function showBanner(text) {
+        const banner = document.getElementById("unlockBanner");
+        banner.innerText = text;
+        banner.classList.add("show");
+
+        setTimeout(() => {
+          banner.classList.remove("show");
+        }, 2500);
+      }
+    </script>
+    <div id="unlockBanner" class="unlock-banner"></div>
+  </body>
+</html>
